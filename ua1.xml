@@ -1,16 +1,11 @@
-<!ELEMENT config (account, uaserver, rtpaudio, regproxy, log, audio)>
-<!ELEMENT account EMPTY>
-<!ATTLIST account username CDATA #REQUIRED>
-<!ATTLIST account passwd CDATA #REQUIRED>
-<!ELEMENT uaserver EMPTY>
-<!ATTLIST uaserver ip CDATA #IMPLIED>
-<!ATTLIST uaserver puerto CDATA #REQUIRED>
-<!ELEMENT rtpaudio EMPTY>
-<!ATTLIST rtpaudio puerto CDATA #REQUIRED>
-<!ELEMENT regproxy EMPTY>
-<!ATTLIST regproxy ip CDATA #REQUIRED>
-<!ATTLIST regproxy puerto CDATA #REQUIRED>
-<!ELEMENT log EMPTY>
-<!ATTLIST log path CDATA #REQUIRED>
-<!ELEMENT audio EMPTY>
-<!ATTLIST audio path CDATA #REQUIRED>
+
+
+<config>
+        <account username="pablo@ptavi.com" passwd="12345"/>
+        <uaserver ip="127.0.0.1" puerto="8000"/>
+        <rtpaudio puerto="8500"/>
+        <regproxy ip="127.0.0.1" puerto="8050"/>
+        <log path="log1.txt"/>
+        <audio path="cancion.mp3"/>
+</config>
+
