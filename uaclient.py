@@ -16,13 +16,24 @@ try:
 except:
     sys.exit("Usage: python uaclient.py config metodo opcion")
 
+
 print(CONFIG)
 
-tree = ET.parse(CONFIG)
-root = tree.getroot()
 
-for child in root:
-    print(child.tag, child.attrib)
+# Comprobamos que es un fichero .xml
+xml_comp = CONFIG.split('.')
+try:
+    if xml_comp[1] == 'xml':
+        tree = ET.parse(CONFIG)
+        root = tree.getroot()
+
+        for child in root:
+            print(child.tag, child.attrib)
+except:
+    sys.exit("Usage: The file is not a .xml or does not exist")
+
+
+
 
 
 # Creamos el socket, lo configuramos y lo atamos a un servidor/puerto
