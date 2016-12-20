@@ -6,8 +6,7 @@ Programa cliente que abre un socket a un servidor
 
 import socket
 import sys
-import xml.etree.ElementTree as ET
-
+from lxml import etree
 
 try:
     CONFIG = str(sys.argv[1])
@@ -19,22 +18,61 @@ except:
 
 print(CONFIG)
 
-
-# Comprobamos que es un fichero .xml
-xml_comp = CONFIG.split('.')
 try:
-    if xml_comp[1] == 'xml':
-        tree = ET.parse(CONFIG)
-        root = tree.getroot()
-
-        for child in root:
-            print(child.tag, child.attrib)
+    open(CONFIG)
 except:
     sys.exit("Usage: The file is not a .xml or does not exist")
 
+#Creamos nuestra estructura de datos ElementTree
+doc = etree.parse(CONFIG)
+
+#Obtenemos nuestros elementos que forman ElementTree
+elementos = doc.getroot()
+
+print(len(elementos))
+print(elementos[0].attrib)
+
+#Obtenemos nuestras variables
+account = elementos[0].attrib
+username = account.get("username")
+passwd = account.get("passwd")
+
+uaserver = elementos[1].attrib
+ipServer = uaserver.get("ip")
+portServer = uaserver.get("puerto")
+
+rtpaudio = elementos[2].attrib
+portRtp = rtpaudio.get("puerto")
+
+regproxy = elementos[3].attrib
+ipProxy = regproxy.get("ip")
+portProxy = regproxy.get("puerto")
+
+log = elementos[4].attrib
+pathLog = log.get("path")
+
+audio = elementos[5].attrib
+pathAudio = audio.get("path")
+
+#Imprimimos 
+print(username)
+print(passwd)
+print(ipServer)
+print(portServer)
+print(portRtp)
+print(ipProxy)
+print(portProxy)
+print(pathLog)
+print(pathAudio)
+print("--------------------------------")
 
 
+#Metodos
+if METODO == "REGISTER":
+    Message = (METODO + " sip:" + username + ":" + str(passwd) + 
+              "SIP/2.0\r\n" + "Expires: " + OPCION)
 
+print(Message)
 
 # Creamos el socket, lo configuramos y lo atamos a un servidor/puerto
 #my_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
