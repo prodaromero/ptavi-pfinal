@@ -7,6 +7,7 @@ Programa cliente que abre un socket a un servidor
 import socket
 import sys
 from lxml import etree
+import time
 
 try:
     CONFIG = str(sys.argv[1])
@@ -66,15 +67,48 @@ print(pathLog)
 print(pathAudio)
 print("--------------------------------")
 
+print(" Starting...")
+hora = time.time()
+
 
 #Metodos
-if METODO == "REGISTER":
-    Message = (METODO + " sip:" + username + ":" + str(passwd) + 
-              "SIP/2.0\r\n" + "Expires: " + OPCION)
+try:
+    Message = METODO + " sip:"
+    if METODO == "REGISTER":
+        Message = (Message + username +  ":" + str(passwd)
+                   + " SIP/2.0\r\n" + "Expires: " + str(OPCION))
 
-print(Message)
+    elif METODO == "INVITE":
+        Message = (Message + OPCION + " SIP/2.0\r\n" 
+                   + "Content-Type: application/sdp\r\n\r\n" + "v=0\r\n"
+                   + username + " " + ipServer + "\r\n" + "s=misesion\r\n"
+                   + "t=0\r\n" + "m=" + str(elementos[5].tag) +" "
+                   + portRtp + " RTP")
+    elif METODO == "BYE":
+        Message = (Message + OPCION + " SIP/2.0")
+
+    print("Enviando: " + Message)
+except:
+    sys.exit("Usage: Method must be REGISTER, INVITE or BYE")
+
 
 # Creamos el socket, lo configuramos y lo atamos a un servidor/puerto
-#my_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-#my_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-#my_socket.connect((IP, PORT))
+my_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+my_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+my_socket.connect((ipProxy, int(portProxy)))
+
+print("Enviando: " + Message)
+my_socket.send(bytes(Message, 'utf-8') + b'\r\n')
+data = my_socket.recv(1024)
+
+
+
+
+
+
+
+
+
+
+
+
