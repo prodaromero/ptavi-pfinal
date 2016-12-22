@@ -1,0 +1,8 @@
+<config>
+        <account username="gosth@fantasma.com" passwd="56789"/>
+        <uaserver ip="127.0.0.1" puerto="9000"/>
+        <rtpaudio puerto="9500"/>
+        <regproxy ip="127.0.0.1" puerto="9050"/>
+        <log path="log2.txt"/>
+        <audio path="cancion.mp3"/>
+</config>
