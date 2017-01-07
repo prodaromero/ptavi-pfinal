@@ -8,6 +8,7 @@ import socket
 import sys
 from lxml import etree
 import time
+import os
 
 try:
     CONFIG = str(sys.argv[1])
@@ -70,13 +71,35 @@ print("--------------------------------")
 print(" Starting...")
 hora = time.time()
 
+# Creamos el socket, lo configuramos y lo atamos a un servidor/puerto
+my_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+my_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+my_socket.connect((ipProxy, int(portProxy)))
 
-#Metodos
+
 try:
+    Metodos = ['REGISTER', 'INVITE', 'BYE']
+
     Message = METODO + " sip:"
     if METODO == "REGISTER":
         Message = (Message + username +  ":" + str(passwd)
-                   + " SIP/2.0\r\n" + "Expires: " + str(OPCION))
+                   + " SIP/2.0\r\n" + "Expires: " + str(OPCION) + "\r\n")
+        print("Enviando: " + Message)
+        #Enviamos el mensaje Register
+        my_socket.send(bytes(Message, 'utf-8') + b'\r\n')
+        data = my_socket.recv(1024)
+
+        #Esperamos a recibir la Autorizacion
+        M_Recieve = data.decode('utf-8')
+        print("Recibido -- " + M_Recieve + "\r\n")
+        Autorizacion = M_Recieve.split("\r\n")[1]
+        nonce = Autorizacion.split('=')[1]
+        print(nonce)
+
+        #Enviamos el nuevo Register con la Autorizacion
+        Message = (Message + M_Recieve + "\r\n")
+        my_socket.send(bytes(Message, 'utf-8') + b'\r\n')
+        data = my_socket.recv(1024)
 
     elif METODO == "INVITE":
         Message = (Message + OPCION + " SIP/2.0\r\n" 
@@ -87,21 +110,15 @@ try:
     elif METODO == "BYE":
         Message = (Message + OPCION + " SIP/2.0")
 
-    print("Enviando: " + Message)
 except:
-    sys.exit("Usage: Method must be REGISTER, INVITE or BYE")
+        sys.exit("Usage: Method must be REGISTER, INVITE or BYE")
 
 
-# Creamos el socket, lo configuramos y lo atamos a un servidor/puerto
-my_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-my_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-my_socket.connect((ipProxy, int(portProxy)))
 
-print("Enviando: " + Message)
+
+print("Enviando: " + Message + "\r\n")
 my_socket.send(bytes(Message, 'utf-8') + b'\r\n')
 data = my_socket.recv(1024)
-
-
 
 
 
