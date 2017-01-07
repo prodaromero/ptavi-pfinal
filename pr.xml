@@ -1,0 +1,5 @@
+<config>
+    <serever name="ServidorProxy" ip="127.0.0.1" puerto="7000"/>
+    <database path="database.json" passwdpath="passwords.txt"/>
+    <log path="proxy_log.xml"/>
+</config>
