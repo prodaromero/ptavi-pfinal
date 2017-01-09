@@ -77,48 +77,56 @@ my_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 my_socket.connect((ipProxy, int(portProxy)))
 
 
-try:
-    Metodos = ['REGISTER', 'INVITE', 'BYE']
+#try:
+Metodos = ['REGISTER', 'INVITE', 'BYE']
 
-    Message = METODO + " sip:"
-    if METODO == "REGISTER":
-        Message = (Message + username +  ":" + str(passwd)
-                   + " SIP/2.0\r\n" + "Expires: " + str(OPCION) + "\r\n")
-        print("Enviando: " + Message)
-        #Enviamos el mensaje Register
-        my_socket.send(bytes(Message, 'utf-8') + b'\r\n')
-        data = my_socket.recv(1024)
+Message = METODO + " sip:"
+if METODO == "REGISTER":
+    Message = (Message + username +  ":" + str(portServer)
+               + " SIP/2.0\r\n" + "Expires: " + str(OPCION) + "\r\n")
+    print("Enviando: " + Message)
+    #Enviamos el mensaje Register
+    my_socket.send(bytes(Message, 'utf-8') + b'\r\n')
+    data = my_socket.recv(1024)
 
-        #Esperamos a recibir la Autorizacion
-        M_Recieve = data.decode('utf-8')
-        print("Recibido -- " + M_Recieve + "\r\n")
-        Autorizacion = M_Recieve.split("\r\n")[1]
-        nonce = Autorizacion.split('=')[1]
-        print(nonce)
+    #Esperamos a recibir la Autorizacion
+    M_Recieve = data.decode('utf-8')
+    print("Recibido -- " + M_Recieve + "\r\n")
+    Autorizacion = M_Recieve.split("\r\n")[1]
+    nonce = Autorizacion.split('=')[1]
+    Message = Message + Autorizacion
 
-        #Enviamos el nuevo Register con la Autorizacion
-        Message = (Message + M_Recieve + "\r\n")
-        my_socket.send(bytes(Message, 'utf-8') + b'\r\n')
-        data = my_socket.recv(1024)
+    #Enviamos el nuevo mensaje
+    my_socket.send(bytes(Message, 'utf-8') + b'\r\n')
+    data = my_socket.recv(1024)
+    print("Enviando:\r\n" + Message + "\r\n")
 
-    elif METODO == "INVITE":
-        Message = (Message + OPCION + " SIP/2.0\r\n" 
-                   + "Content-Type: application/sdp\r\n\r\n" + "v=0\r\n"
-                   + username + " " + ipServer + "\r\n" + "s=misesion\r\n"
-                   + "t=0\r\n" + "m=" + str(elementos[5].tag) +" "
-                   + portRtp + " RTP")
-    elif METODO == "BYE":
-        Message = (Message + OPCION + " SIP/2.0")
+    M_Recieve = data.decode('utf-8')
+    print("Recibido -- " + M_Recieve + "\r\n")
+elif METODO == "INVITE":
+    Message = (Message + OPCION + " SIP/2.0\r\n" 
+               + "Content-Type: application/sdp\r\n\r\n" + "v=0\r\n" + "o="
+               + username + " " + ipServer + "\r\n" + "s=misesion\r\n"
+               + "t=0\r\n" + "m=" + str(elementos[5].tag) + " "
+               + portRtp + " RTP")
+    print("Enviando:\r\n" + Message + "\r\n")
+    my_socket.send(bytes(Message, 'utf-8') + b'\r\n')
 
-except:
-        sys.exit("Usage: Method must be REGISTER, INVITE or BYE")
+    #Datos recividos del Servidor
+    data = my_socket.recv(1024)
+    respuesta = data.decode('utf-8')
+    print("Recibiendo del Servidor:\r\n" + respuesta)
+
+elif METODO == "BYE":
+    Message = (Message + OPCION + " SIP/2.0")
+
+
+#except:
+#        sys.exit("Usage: Method must be REGISTER, INVITE or BYE")
 
 
 
 
-print("Enviando: " + Message + "\r\n")
-my_socket.send(bytes(Message, 'utf-8') + b'\r\n')
-data = my_socket.recv(1024)
 
 
 
