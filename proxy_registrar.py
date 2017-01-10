@@ -22,23 +22,13 @@ doc = etree.parse(CONFIG)
 #Obtenemos nuestros elementos que forman ElementTree
 elementos = doc.getroot()
 
-#Obtenemos nuestras variables
+#Obtenemos nuestras variables del xml
 name = elementos[0].attrib["name"]
-print(name)
 IP = elementos[0].attrib["ip"]
-print(IP)
 portProxy = elementos[0].attrib["puerto"]
-print(portProxy)
-
 databasePath = elementos[1].attrib["path"]
-print(databasePath)
 passwdpath = elementos[1].attrib["passwdpath"]
-print(passwdpath)
-
 log = elementos[2].attrib["path"]
-print(log)
-
-print("---------------------------")
 
 
 class EchoHandler(socketserver.DatagramRequestHandler):
@@ -77,7 +67,9 @@ class EchoHandler(socketserver.DatagramRequestHandler):
                 break
             M_Recieve = line.decode('utf-8')
             print("El cliente nos manda:\r\n" + M_Recieve)
+
             ServerPort = []
+            MethodServer = ['INVITE', 'ACK', 'BYE']
             #Obtenemos variables del mensaje recibido
             Line = M_Recieve.split('\r\n')
             Package = Line[0].split(' ')
@@ -86,84 +78,70 @@ class EchoHandler(socketserver.DatagramRequestHandler):
             #Generamos el numero de Autenticación aleatoriamente en un intervalo
             nonce = random.randint(0,999999999999999999999)
             if METHOD == 'REGISTER':
-                print("REGISTERREGISTERREGISTER\r\n")
+
                 Autorizacion = Line[2]
-                print(User)
                 ServerPort = Package[1].split(':')[2]
-                print(ServerPort)
                 Expires = Line[1].split(' ')[1]
-                print(Expires)
                 self.Client_Register[User] = ServerPort
-                print(self.Client_Register)
+
                 if 'Authenticate:' not in Autorizacion:
                     Message = ("SIP/2.0 401 Unanthorized\r\n"
                                + "WWW Authenticate: nonce=" + str(nonce))
+                    print("-----------\r\n")
                     print("Enviando:\r\n" + Message + "\r\n")
+                    print("-----------\r\n")
                     self.wfile.write(bytes(Message, 'utf-8'))
 
                 else:
                     Message = "SIP/2.0 200 OK\r\n"
+                    print("-----------\r\n")
                     print("Enviando:\r\n" + Message + "\r\n")
                     self.wfile.write(bytes(Message, 'utf-8'))
+                    print("-----------\r\n")
 
-            elif METHOD == 'INVITE':
-                print("INVITEINVITEINVITEINVITE\r\n")
-                print(User)
+            elif METHOD in MethodServer:
                 for user in self.Client_Register:
-                    print(User)
-                    print("%%%%%%%%%%%%%%%")
-                    print(user)
                     if User == user:
                         self.ServerPort = self.Client_Register[user]
-                        print(self.ServerPort)
-                        
-                print(self.ServerPort)
+
                 #Recivimos el mensaje y lo reenviamos al Servidor
                 my_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
                 my_socket.connect((IP, int(self.ServerPort)))
-                my_socket.send(bytes(M_Recieve, 'utf-8'))
-                print("-----------")
-                print("Reenviando:\r\n" + M_Recieve)
-                #Recivimos la confirmacion del INVITE y la reenviamos al cliente
-                data = my_socket.recv(1024)
-                respuesta = data.decode('utf-8')
-                print("Recibiendo del Servidor y reenviando al cliente:\r\n" +
-                      respuesta)
-                self.wfile.write(bytes(respuesta, 'utf-8') + b'\r\n')
 
-            elif METHOD == 'ACK':
-                print("ACKACKACKACKACKACKACKA\r\n")
-                print(User)
-                print(self.Client_Register)
-                for user in self.Client_Register:
-                    if User == user:
-                        self.ServerPort = self.Client_Register[user]
-                        print(self.ServerPort)
-                my_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-                my_socket.connect((IP, int(self.ServerPort)))
-                my_socket.send(bytes(M_Recieve, 'utf-8'))
-                print("-----------")
-                print("Reenviando:\r\n" + M_Recieve)
-            elif METHOD == 'BYE':
-                for user in self.Client_Register:
-                    if User == user:
-                        self.ServerPort = self.Client_Register[user]
-                        print(self.ServerPort)
-                        
-                print(self.ServerPort)
-                #Recivimos el mensaje y lo reenviamos al Servidor
-                my_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-                my_socket.connect((IP, int(self.ServerPort)))
-                my_socket.send(bytes(M_Recieve, 'utf-8'))
-                print("-----------")
-                print("Reenviando:\r\n" + M_Recieve)
-
-                data = my_socket.recv(1024)
-                respuesta = data.decode('utf-8')
-                print("Recibindo del Servidor y reenviando al cliente:\r\n" +
-                      respuesta)
-                self.wfile.write(bytes(respuesta, 'utf-8') + b'\r\n')
+                if METHOD == 'INVITE':
                     
+                    my_socket.send(bytes(M_Recieve, 'utf-8'))
+                    print("-----------\r\n")
+                    print("Reenviando:\r\n" + M_Recieve)
+                    #Recivimos la confirmacion del INVITE y la reenviamos 
+                    print("-----------\r\n")
+                    data = my_socket.recv(1024)
+                    respuesta = data.decode('utf-8')
+                    print("Recibiendo del Servidor y reenviando al cliente:\r\n"
+                          + respuesta)
+                    print("-----------\r\n")
+                    self.wfile.write(bytes(respuesta, 'utf-8') + b'\r\n')
+
+                elif METHOD == 'ACK':
+
+                    my_socket.send(bytes(M_Recieve, 'utf-8'))
+                    print("-----------\r\n")
+                    print("Reenviando:\r\n" + M_Recieve)
+                elif METHOD == 'BYE':
+
+                    my_socket.send(bytes(M_Recieve, 'utf-8'))
+                    print("-----------\r\n")
+                    print("Reenviando:\r\n" + M_Recieve)
+
+                    data = my_socket.recv(1024)
+                    respuesta = data.decode('utf-8')
+                    print("-----------\r\n")
+                    print("Recibindo del Servidor y reenviando al cliente:\r\n" +
+                          respuesta)
+                    self.wfile.write(bytes(respuesta, 'utf-8') + b'\r\n')
+                    print("-----------\r\n")
+
+
 if __name__ == "__main__":
 
     print('Listens = socket.socket(socket.AF_INET, socket.SOCK_STREAM)ing...')
