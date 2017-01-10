@@ -85,17 +85,16 @@ class EchoHandler(socketserver.DatagramRequestHandler):
             User = Package[1].split(':')[1]
             #Generamos el numero de Autenticación aleatoriamente en un intervalo
             nonce = random.randint(0,999999999999999999999)
-            Autorizacion = Line[2]
             if METHOD == 'REGISTER':
-
+                print("REGISTERREGISTERREGISTER\r\n")
+                Autorizacion = Line[2]
                 print(User)
                 ServerPort = Package[1].split(':')[2]
                 print(ServerPort)
                 Expires = Line[1].split(' ')[1]
                 print(Expires)
-                self.attr['PuertoServidor'] = ServerPort
-                self.Client_Register[User].append(Serverport)
-
+                self.Client_Register[User] = ServerPort
+                print(self.Client_Register)
                 if 'Authenticate:' not in Autorizacion:
                     Message = ("SIP/2.0 401 Unanthorized\r\n"
                                + "WWW Authenticate: nonce=" + str(nonce))
@@ -108,6 +107,7 @@ class EchoHandler(socketserver.DatagramRequestHandler):
                     self.wfile.write(bytes(Message, 'utf-8'))
 
             elif METHOD == 'INVITE':
+                print("INVITEINVITEINVITEINVITE\r\n")
                 print(User)
                 for user in self.Client_Register:
                     print(User)
@@ -116,9 +116,7 @@ class EchoHandler(socketserver.DatagramRequestHandler):
                     if User == user:
                         self.ServerPort = self.Client_Register[user]
                         print(self.ServerPort)
-                        self.ServerPort = self.ServerPort["PuertoServidor"]
-                        print(self.ServerPort)
-                        print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
+                        
                 print(self.ServerPort)
                 #Recivimos el mensaje y lo reenviamos al Servidor
                 my_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -129,13 +127,43 @@ class EchoHandler(socketserver.DatagramRequestHandler):
                 #Recivimos la confirmacion del INVITE y la reenviamos al cliente
                 data = my_socket.recv(1024)
                 respuesta = data.decode('utf-8')
-                print("Reciviendo del Servidor y reenviando al cliente:\r\n" +
+                print("Recibiendo del Servidor y reenviando al cliente:\r\n" +
                       respuesta)
                 self.wfile.write(bytes(respuesta, 'utf-8') + b'\r\n')
 
-            print(self.Client_Register)
-     
+            elif METHOD == 'ACK':
+                print("ACKACKACKACKACKACKACKA\r\n")
+                print(User)
+                print(self.Client_Register)
+                for user in self.Client_Register:
+                    if User == user:
+                        self.ServerPort = self.Client_Register[user]
+                        print(self.ServerPort)
+                my_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+                my_socket.connect((IP, int(self.ServerPort)))
+                my_socket.send(bytes(M_Recieve, 'utf-8'))
+                print("-----------")
+                print("Reenviando:\r\n" + M_Recieve)
+            elif METHOD == 'BYE':
+                for user in self.Client_Register:
+                    if User == user:
+                        self.ServerPort = self.Client_Register[user]
+                        print(self.ServerPort)
+                        
+                print(self.ServerPort)
+                #Recivimos el mensaje y lo reenviamos al Servidor
+                my_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+                my_socket.connect((IP, int(self.ServerPort)))
+                my_socket.send(bytes(M_Recieve, 'utf-8'))
+                print("-----------")
+                print("Reenviando:\r\n" + M_Recieve)
 
+                data = my_socket.recv(1024)
+                respuesta = data.decode('utf-8')
+                print("Recibindo del Servidor y reenviando al cliente:\r\n" +
+                      respuesta)
+                self.wfile.write(bytes(respuesta, 'utf-8') + b'\r\n')
+                    
 if __name__ == "__main__":
 
     print('Listens = socket.socket(socket.AF_INET, socket.SOCK_STREAM)ing...')
