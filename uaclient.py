@@ -116,11 +116,28 @@ elif METODO == "INVITE":
     data = my_socket.recv(1024)
     respuesta = data.decode('utf-8')
     print("Recibiendo del Servidor:\r\n" + respuesta)
+    Lines = respuesta.split('\r\n')
+    Trying = Lines[0].split(' ')[1]
+    print(Trying)
+    Rining = Lines[1].split(' ')[1]
+    print(Rining)
+    OK = Lines[2].split(' ')[1]
+    print(OK)
+    Client = Lines[6].split(' ')[0]
+    UserClient = Client.split('=')[1]
+    if Trying == '100' and Rining == '180' and OK == '200':
+        Message = ('ACK sip:' + UserClient + " SIP/2.0")
+        my_socket.send(bytes(Message, 'utf-8') + b'\r\n')
+        print("Enviando:\r\n" + Message + "\r\n")
 
 elif METODO == "BYE":
     Message = (Message + OPCION + " SIP/2.0")
+    print("Enviando:\r\n" + Message + "\r\n")
+    my_socket.send(bytes(Message, 'utf-8') + b'\r\n')
 
-
+    data = my_socket.recv(1024)
+    respuesta = data.decode('utf-8')
+    print("Recibiendo del Servidor:\r\n" + respuesta)
 #except:
 #        sys.exit("Usage: Method must be REGISTER, INVITE or BYE")
 
