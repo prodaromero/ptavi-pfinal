@@ -86,7 +86,7 @@ class EchoHandler(socketserver.DatagramRequestHandler):
                 Message = ("SIP/2.0 100 Trying\r\n" + "SIP/2.0 180 Ring\r\n" +
                            "SIP/2.0 200 OK\r\n" + 
                            "Content-Type: application/sdp\r\n\r\n" + "v=0\r\n"
-                           + username + " " + ipServer + "\r\n" + 
+                           + "o=" + username + " " + ipServer + "\r\n" + 
                            "s=misesion\r\n" + "t=0\r\n" + "m=" + 
                            str(elementos[5].tag) + " " + portRtp + " RTP")
                 self.wfile.write(bytes(Message, 'utf-8') + b'\r\n')
@@ -99,12 +99,17 @@ class EchoHandler(socketserver.DatagramRequestHandler):
                 os.system(aEjecutar)
             elif METHOD == 'BYE':
                 Message = "SIP/2.0 200 OK\r\n\r\n"
+                self.wfile.write(bytes(Message, 'utf-8') + b'\r\n')
+                print("Enviando:\r\n" + Message)
             elif METHOD not in METHOD_CLASS:
                 Message = "SIP/2.0 405 Method Not Allowed\r\n\r\n"
+                self.wfile.write(bytes(Message, 'utf-8') + b'\r\n')
+                print("Enviando:\r\n" + Message)
             else:
                 Message = "SIP/2.0 400 Bad Request\r\n\r\n"
+                self.wfile.write(bytes(Message, 'utf-8') + b'\r\n')
+                print("Enviando:\r\n" + Message)
 
-            print("Enviando:\r\n" + Message)
 
 
 if __name__ == "__main__":
