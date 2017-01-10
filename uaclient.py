@@ -17,9 +17,6 @@ try:
 except:
     sys.exit("Usage: python uaclient.py config metodo opcion")
 
-
-print(CONFIG)
-
 try:
     open(CONFIG)
 except:
@@ -30,9 +27,6 @@ doc = etree.parse(CONFIG)
 
 #Obtenemos nuestros elementos que forman ElementTree
 elementos = doc.getroot()
-
-print(len(elementos))
-print(elementos[0].attrib)
 
 #Obtenemos nuestras variables
 account = elementos[0].attrib
@@ -56,19 +50,9 @@ pathLog = log.get("path")
 audio = elementos[5].attrib
 pathAudio = audio.get("path")
 
-#Imprimimos 
-print(username)
-print(passwd)
-print(ipServer)
-print(portServer)
-print(portRtp)
-print(ipProxy)
-print(portProxy)
-print(pathLog)
-print(pathAudio)
-print("--------------------------------")
 
-print(" Starting...")
+print("Starting...\r\n")
+print("-----------\r\n")
 hora = time.time()
 
 # Creamos el socket, lo configuramos y lo atamos a un servidor/puerto
@@ -85,6 +69,7 @@ if METODO == "REGISTER":
     Message = (Message + username +  ":" + str(portServer)
                + " SIP/2.0\r\n" + "Expires: " + str(OPCION) + "\r\n")
     print("Enviando: " + Message)
+    print("-----------\r\n")
     #Enviamos el mensaje Register
     my_socket.send(bytes(Message, 'utf-8') + b'\r\n')
     data = my_socket.recv(1024)
@@ -92,6 +77,7 @@ if METODO == "REGISTER":
     #Esperamos a recibir la Autorizacion
     M_Recieve = data.decode('utf-8')
     print("Recibido -- " + M_Recieve + "\r\n")
+    print("-----------\r\n")
     Autorizacion = M_Recieve.split("\r\n")[1]
     nonce = Autorizacion.split('=')[1]
     Message = Message + Autorizacion
@@ -100,9 +86,11 @@ if METODO == "REGISTER":
     my_socket.send(bytes(Message, 'utf-8') + b'\r\n')
     data = my_socket.recv(1024)
     print("Enviando:\r\n" + Message + "\r\n")
+    print("-----------\r\n")
 
     M_Recieve = data.decode('utf-8')
     print("Recibido -- " + M_Recieve + "\r\n")
+    print("-----------\r\n")
 elif METODO == "INVITE":
     Message = (Message + OPCION + " SIP/2.0\r\n" 
                + "Content-Type: application/sdp\r\n\r\n" + "v=0\r\n" + "o="
@@ -110,34 +98,37 @@ elif METODO == "INVITE":
                + "t=0\r\n" + "m=" + str(elementos[5].tag) + " "
                + portRtp + " RTP")
     print("Enviando:\r\n" + Message + "\r\n")
+    print("-----------\r\n")
     my_socket.send(bytes(Message, 'utf-8') + b'\r\n')
 
     #Datos recividos del Servidor
     data = my_socket.recv(1024)
     respuesta = data.decode('utf-8')
     print("Recibiendo del Servidor:\r\n" + respuesta)
+    print("-----------\r\n")
     Lines = respuesta.split('\r\n')
     Trying = Lines[0].split(' ')[1]
-    print(Trying)
     Rining = Lines[1].split(' ')[1]
-    print(Rining)
     OK = Lines[2].split(' ')[1]
-    print(OK)
     Client = Lines[6].split(' ')[0]
     UserClient = Client.split('=')[1]
+
     if Trying == '100' and Rining == '180' and OK == '200':
         Message = ('ACK sip:' + UserClient + " SIP/2.0")
         my_socket.send(bytes(Message, 'utf-8') + b'\r\n')
         print("Enviando:\r\n" + Message + "\r\n")
+        print("-----------\r\n")
 
 elif METODO == "BYE":
     Message = (Message + OPCION + " SIP/2.0")
     print("Enviando:\r\n" + Message + "\r\n")
+    print("-----------\r\n")
     my_socket.send(bytes(Message, 'utf-8') + b'\r\n')
 
     data = my_socket.recv(1024)
     respuesta = data.decode('utf-8')
     print("Recibiendo del Servidor:\r\n" + respuesta)
+    print("-----------\r\n")
 #except:
 #        sys.exit("Usage: Method must be REGISTER, INVITE or BYE")
 
