@@ -47,7 +47,7 @@ def CreateLog(Log, Time, Message):
 
 # Inicializamos el fichero
 open(pathLog, 'w')
-Time = time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime(time.time()))
+Time = time.strftime('%Y%m%d%H%M%S', time.gmtime(time.time()))
 Message = " Starting..."
 CreateLog(pathLog, Time, Message + "\r\n")
 
@@ -111,29 +111,30 @@ class EchoHandler(socketserver.DatagramRequestHandler):
                 self.Client_Register[User] = ServerPort
 
                 # LOG
-                Time = time.strftime('%Y-%m-%d %H:%M:%S',
+                Time = time.strftime('%Y%m%d%H%M%S',
                                      time.gmtime(time.time()))
-                MessageLog = (" Recieved from: " + IP + ":" + portProxy + " " +
-                              METHOD + " " + User + ": [...]")
+                MessageLog = (" Recieved from: " + IP + ":" + portProxy +
+                              ": " + METHOD + " " + User + ": [...]")
                 CreateLog(pathLog, Time, MessageLog + "\r\n")
 
                 if 'Authenticate:' not in Autorizacion:
-                    Message = ("SIP/2.0 401 Unanthorized\r\n" +
-                               "WWW Authenticate: nonce=" + str(nonce))
+                    Message = ("SIP/2.0 401 Unanthorized\r\n\r\n" +
+                               "WWW Authenticate: nonce=" + str(nonce) +
+                               "\r\n\r\n")
                     print("-----------\r\n")
                     print("Enviando:\r\n" + Message + "\r\n")
                     print("-----------\r\n")
                     self.wfile.write(bytes(Message, 'utf-8'))
 
                     # LOG
-                    Time = time.strftime('%Y-%m-%d %H:%M:%S',
+                    Time = time.strftime('%Y%m%d%H%M%S',
                                          time.gmtime(time.time()))
                     MessageLog = (" Sent to: " + IP + ":" + portProxy +
-                                  " 401 Unanthorized [...]")
+                                  ": 401 Unanthorized [...]")
                     CreateLog(pathLog, Time, MessageLog + "\r\n")
 
                     MessageLog = (" Sent to: " + IP + ":" + portProxy +
-                                  " WWW Authenticate [...]")
+                                  ": WWW Authenticate [...]")
                     CreateLog(pathLog, Time, MessageLog + "\r\n")
 
                 else:
@@ -144,10 +145,10 @@ class EchoHandler(socketserver.DatagramRequestHandler):
                     print("-----------\r\n")
 
                     # LOG
-                    Time = time.strftime('%Y-%m-%d %H:%M:%S',
+                    Time = time.strftime('%Y%m%d%H%M%S',
                                          time.gmtime(time.time()))
                     MessageLog = (" Sent to: " + IP + ":" + portProxy +
-                                  " 200 OK [...]")
+                                  ": 200 OK [...]")
                     CreateLog(pathLog, Time, MessageLog + "\r\n")
 
             elif METHOD in MethodServer:
@@ -156,10 +157,7 @@ class EchoHandler(socketserver.DatagramRequestHandler):
 
                     for user in self.Client_Register:
                         if User == user:
-                            print(user)
-                            print(User)
                             self.ServerPort = self.Client_Register[user]
-                    print(self.Client_Register)
 
                     # Recivimos el mensaje y lo reenviamos al Servidor
                     my_socket = socket.socket(socket.AF_INET,
@@ -173,18 +171,18 @@ class EchoHandler(socketserver.DatagramRequestHandler):
                         print("Reenviando:\r\n" + M_Recieve)
 
                         # LOG
-                        Time = time.strftime('%Y-%m-%d %H:%M:%S',
+                        Time = time.strftime('%Y%m%d%H%M%S',
                                              time.gmtime(time.time()))
                         MessageLog = (" Recieved from: " + IP + ":" +
-                                      portProxy + " " + METHOD + " " + User +
-                                      ": [...]")
+                                      portProxy + ": " + METHOD + " " + User +
+                                      " [...]")
                         CreateLog(pathLog, Time, MessageLog + "\r\n")
 
                         # LOG
-                        Time = time.strftime('%Y-%m-%d %H:%M:%S',
+                        Time = time.strftime('%Y%m%d%H%M%S',
                                              time.gmtime(time.time()))
                         MessageLog = (" Sent to: " + IP + ":" + portProxy +
-                                      " " + METHOD + " " + User + ": [...]")
+                                      ": " + METHOD + ": " + User + " [...]")
                         CreateLog(pathLog, Time, MessageLog + "\r\n")
 
                         # Recivimos la confirmacion del INVITE y la reenviamos
@@ -196,18 +194,18 @@ class EchoHandler(socketserver.DatagramRequestHandler):
                         self.wfile.write(bytes(respuesta, 'utf-8') + b'\r\n')
 
                         # LOG
-                        Time = time.strftime('%Y-%m-%d %H:%M:%S',
+                        Time = time.strftime('%Y%m%d%H%M%S',
                                              time.gmtime(time.time()))
                         MessageLog = (" Recieved from: " + IP + ":" +
-                                      portProxy + " " + METHOD + " " +
+                                      portProxy + ": " + METHOD + " " +
                                       User + ": [...]")
                         CreateLog(pathLog, Time, MessageLog + "\r\n")
 
                         # LOG
-                        Time = time.strftime('%Y-%m-%d %H:%M:%S',
+                        Time = time.strftime('%Y%m%d%H%M%S',
                                              time.gmtime(time.time()))
                         MessageLog = (" Sent to: " + IP + ":" + portProxy +
-                                      " " + METHOD + " " + User + ": [...]")
+                                      ": " + METHOD + " " + User + ": [...]")
                         CreateLog(pathLog, Time, MessageLog + "\r\n")
 
                     elif METHOD == 'ACK':
@@ -217,18 +215,18 @@ class EchoHandler(socketserver.DatagramRequestHandler):
                         print("Reenviando:\r\n" + M_Recieve)
 
                         # LOG
-                        Time = time.strftime('%Y-%m-%d %H:%M:%S',
+                        Time = time.strftime('%Y%m%d%H%M%S',
                                              time.gmtime(time.time()))
                         MessageLog = (" Recieved from: " + IP + ":" +
-                                      portProxy + " " + METHOD + " " + User +
+                                      portProxy + ": " + METHOD + " " + User +
                                       ": [...]")
                         CreateLog(pathLog, Time, MessageLog + "\r\n")
 
                         # LOG
-                        Time = time.strftime('%Y-%m-%d %H:%M:%S',
+                        Time = time.strftime('%Y%m%d%H%M%S',
                                              time.gmtime(time.time()))
                         MessageLog = (" Sent to: " + IP + ":" + portProxy +
-                                      " " + METHOD + " " + User + ": [...]")
+                                      ": " + METHOD + " " + User + ": [...]")
                         CreateLog(pathLog, Time, MessageLog + "\r\n")
 
                     elif METHOD == 'BYE':
@@ -238,18 +236,18 @@ class EchoHandler(socketserver.DatagramRequestHandler):
                         print("Reenviando:\r\n" + M_Recieve)
 
                         # LOG
-                        Time = time.strftime('%Y-%m-%d %H:%M:%S',
+                        Time = time.strftime('%Y%m%d%H%M%S',
                                              time.gmtime(time.time()))
                         MessageLog = (" Recieved from: " + IP + ":" +
-                                      portProxy + " " + METHOD + " " +
+                                      portProxy + ": " + METHOD + " " +
                                       User + ": [...]")
                         CreateLog(pathLog, Time, MessageLog + "\r\n")
 
                         # LOG
-                        Time = time.strftime('%Y-%m-%d %H:%M:%S',
+                        Time = time.strftime('%Y%m%d%H%M%S',
                                              time.gmtime(time.time()))
                         MessageLog = (" Sent to: " + IP + ":" + portProxy +
-                                      " " + METHOD + " " + User + ": [...]")
+                                      ": " + METHOD + " " + User + ": [...]")
                         CreateLog(pathLog, Time, MessageLog + "\r\n")
 
                         data = my_socket.recv(1024)
@@ -260,18 +258,18 @@ class EchoHandler(socketserver.DatagramRequestHandler):
                         print("-----------\r\n")
 
                         # LOG
-                        Time = time.strftime('%Y-%m-%d %H:%M:%S',
+                        Time = time.strftime('%Y%m%d%H%M%S',
                                              time.gmtime(time.time()))
                         MessageLog = (" Recieved from: " + IP + ":" +
-                                      portProxy + " " + METHOD + " " +
+                                      portProxy + ": " + METHOD + " " +
                                       User + ": [...]")
                         CreateLog(pathLog, Time, MessageLog + "\r\n")
 
                         # LOG
-                        Time = time.strftime('%Y-%m-%d %H:%M:%S',
+                        Time = time.strftime('%Y%m%d%H%M%S',
                                              time.gmtime(time.time()))
                         MessageLog = (" Sent to: " + IP + ":" + portProxy +
-                                      " " + METHOD + " " + User + ": [...]")
+                                      ": " + METHOD + " " + User + ": [...]")
                         CreateLog(pathLog, Time, MessageLog + "\r\n")
 
                 else:
@@ -282,7 +280,7 @@ class EchoHandler(socketserver.DatagramRequestHandler):
                     self.wfile.write(bytes(Message, 'utf-8') + b'\r\n')
 
                     # LOG
-                    Time = time.strftime('%Y-%m-%d %H:%M:%S',
+                    Time = time.strftime('%Y%m%d%H%M%S',
                                          time.gmtime(time.time()))
                     MessageLog = (" Sent to: " + IP + ":" + portProxy +
                                   ": 404 User Not Found  [...]")
@@ -298,6 +296,6 @@ if __name__ == "__main__":
     except KeyboardInterrupt:
         print()
         print("Servidor finalizado")
-        Time = time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime(time.time()))
+        Time = time.strftime('%Y%m%d%H%M%S', time.gmtime(time.time()))
         Message = " Finishing."
         CreateLog(pathLog, Time, Message + "\r\n")
