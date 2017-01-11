@@ -17,13 +17,14 @@ try:
 except:
     sys.exit("Usage: python uaserver.py config")
 
-#Creamos nuestra estructura de datos ElementTree
+
+# Creamos nuestra estructura de datos ElementTree
 doc = etree.parse(CONFIG)
 
-#Obtenemos nuestros elementos que forman ElementTree
+# Obtenemos nuestros elementos que forman ElementTree
 elementos = doc.getroot()
 
-#Obtenemos nuestras variables
+# Obtenemos nuestras variables
 account = elementos[0].attrib
 username = account.get("username")
 passwd = account.get("passwd")
@@ -67,40 +68,47 @@ class EchoHandler(socketserver.DatagramRequestHandler):
             print("-----------\r\n")
             Line = M_Recieve.split('\r\n')
             Package = Line[0].split(' ')
-            METHOD = Package[0]
+            METODO = Package[0]
+            OPCION = Package[1].split(':')[1]
 
-            if METHOD == 'INVITE':
+            if METODO == 'INVITE':
 
                 IpClient = Line[4].split(' ')[1]
                 Message = ("SIP/2.0 100 Trying\r\n" + "SIP/2.0 180 Ring\r\n" +
-                           "SIP/2.0 200 OK\r\n" + 
-                           "Content-Type: application/sdp\r\n\r\n" + "v=0\r\n"
-                           + "o=" + username + " " + ipServer + "\r\n" + 
-                           "s=misesion\r\n" + "t=0\r\n" + "m=" + 
+                           "SIP/2.0 200 OK\r\n" +
+                           "Content-Type: application/sdp\r\n\r\n" +
+                           "v=0\r\n" + "o=" + username + " " + ipServer +
+                           "\r\n" + "s=misesion\r\n" + "t=0\r\n" + "m=" +
                            str(elementos[5].tag) + " " + portRtp + " RTP")
+
                 self.wfile.write(bytes(Message, 'utf-8') + b'\r\n')
                 print("Enviando:\r\n" + Message)
                 print("-----------\r\n")
 
-            elif METHOD == 'ACK':
-                # aEjecutar es un string con lo que se ha de ejecutar en la shell
+            elif METODO == 'ACK':
+                # aEjecutar es un string con lo que se ha de ejecutar en shell
                 aEjecutar = "./mp32rtp -i " + ipServer + " -p " + portRtp
                 aEjecutar += " < " + pathAudio
                 print("Vamos a ejecutar", aEjecutar)
                 os.system(aEjecutar)
                 print("-----------\r\n")
 
-            elif METHOD == 'BYE':
+            elif METODO == 'BYE':
+
                 Message = "SIP/2.0 200 OK\r\n\r\n"
                 self.wfile.write(bytes(Message, 'utf-8') + b'\r\n')
+
                 print("Enviando:\r\n" + Message)
                 print("-----------\r\n")
 
-            elif METHOD not in METHOD_CLASS:
+            elif METODO not in METHOD_CLASS:
+
                 Message = "SIP/2.0 405 Method Not Allowed\r\n\r\n"
                 self.wfile.write(bytes(Message, 'utf-8') + b'\r\n')
+
                 print("Enviando:\r\n" + Message)
                 print("-----------\r\n")
+
             else:
                 Message = "SIP/2.0 400 Bad Request\r\n\r\n"
                 self.wfile.write(bytes(Message, 'utf-8') + b'\r\n')
@@ -108,10 +116,9 @@ class EchoHandler(socketserver.DatagramRequestHandler):
                 print("-----------\r\n")
 
 
-
 if __name__ == "__main__":
 
-    #Creamos un servidor y escuchamos
+    # Creamos un servidor y escuchamos
     print("Listening...")
 
     serv = socketserver.UDPServer((ipServer, int(portServer)), EchoHandler)
@@ -123,6 +130,3 @@ if __name__ == "__main__":
     except KeyboardInterrupt:
         print()
         print("Servidor finalizado")
-
-
-        
