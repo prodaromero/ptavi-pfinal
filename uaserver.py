@@ -72,10 +72,12 @@ class EchoHandler(socketserver.DatagramRequestHandler):
             OPCION = Package[1].split(':')[1]
 
             if METODO == 'INVITE':
+                print(Line)
+                IpClient = Line[5].split(' ')[1]
 
-                IpClient = Line[4].split(' ')[1]
-                Message = ("SIP/2.0 100 Trying\r\n" + "SIP/2.0 180 Ring\r\n" +
-                           "SIP/2.0 200 OK\r\n" +
+                Message = ("SIP/2.0 100 Trying\r\n\r\n" +
+                           "SIP/2.0 180 Ring\r\n\r\n" +
+                           "SIP/2.0 200 OK\r\n\r\n" +
                            "Content-Type: application/sdp\r\n\r\n" +
                            "v=0\r\n" + "o=" + username + " " + ipServer +
                            "\r\n" + "s=misesion\r\n" + "t=0\r\n" + "m=" +
